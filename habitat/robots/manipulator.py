@@ -147,13 +147,13 @@ class Manipulator(RobotInterface):
                         link_trans = self.sim_obj.transformation
                     else:
                         link_trans = self.sim_obj.get_link_scene_node(
-                            self.params.ee_link
+                            cam_info.attached_link_id
                         ).transformation
 
                     cam_transform = mn.Matrix4.look_at(
                         cam_info.cam_offset_pos,
                         cam_info.cam_look_at_pos,
-                        mn.Vector3(0, 1, 0),
+                        cam_info.cam_up,
                     )
                     cam_transform = (
                         link_trans
@@ -380,6 +380,18 @@ class Manipulator(RobotInterface):
         self._validate_arm_ctrl_input(ctrl)
 
         for i, jidx in enumerate(self.params.arm_joints):
+            self._set_motor_pos(jidx, ctrl[i])
+
+    @property
+    def gripper_motor_pos(self):
+        motor_targets = np.zeros(len(self.params.gripper_init_params))
+        for i, jidx in enumerate(self.params.gripper_joints):
+            motor_targets[i] = self._get_motor_pos(jidx)
+        return motor_targets
+
+    @gripper_motor_pos.setter
+    def gripper_motor_pos(self, ctrl: List[float]) -> None:
+        for i, jidx in enumerate(self.params.gripper_joints):
             self._set_motor_pos(jidx, ctrl[i])
 
     def clip_ee_to_workspace(self, pos: np.ndarray) -> np.ndarray:

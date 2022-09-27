@@ -2,7 +2,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import attr
 import magnum as mn
@@ -10,6 +10,25 @@ import numpy as np
 
 from habitat.robots.manipulator import Manipulator
 from habitat_sim.simulator import Simulator
+
+
+@attr.s(auto_attribs=True, slots=True)
+class RobotCameraParams:
+    """Data to configure a camera placement on the robot.
+    :property attached_link_id: Which link ID this camera is attached to, -1
+        for the base link.
+    :property cam_offset_pos: The 3D position of the camera relative to the
+        transformation of the attached link.
+    :property cam_look_at_pos: The 3D of where the camera should face relative
+        to the transformation of the attached link.
+    :property relative_transform: An added local transform for the camera.
+    """
+
+    attached_link_id: int
+    cam_offset_pos: mn.Vector3
+    cam_look_at_pos: mn.Vector3
+    cam_up: mn.Vector3 = mn.Vector3(0, 1, 0)
+    relative_transform: mn.Matrix4 = mn.Matrix4.identity_init()
 
 
 @attr.s(auto_attribs=True, slots=True)
@@ -53,6 +72,8 @@ class StaticManipulatorParams:
     arm_mtr_pos_gain: float
     arm_mtr_vel_gain: float
     arm_mtr_max_impulse: float
+
+    cameras: Dict[str, RobotCameraParams]
 
 
 class StaticManipulator(Manipulator):
