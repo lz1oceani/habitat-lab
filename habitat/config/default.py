@@ -766,6 +766,11 @@ _C.SIMULATOR.HEAD_RGB_SENSOR.UUID = "robot_head_rgb"
 _C.SIMULATOR.HEAD_DEPTH_SENSOR = _C.SIMULATOR.DEPTH_SENSOR.clone()
 _C.SIMULATOR.HEAD_DEPTH_SENSOR.UUID = "robot_head_depth"
 # -----------------------------------------------------------------------------
+# HEAD SEMANTIC SENSOR
+# -----------------------------------------------------------------------------
+_C.SIMULATOR.HEAD_SEMANTIC_SENSOR = _C.SIMULATOR.SEMANTIC_SENSOR.clone()
+_C.SIMULATOR.HEAD_SEMANTIC_SENSOR.UUID = "robot_head_semantic"
+# -----------------------------------------------------------------------------
 # ARM RGB SENSOR
 # -----------------------------------------------------------------------------
 _C.SIMULATOR.ARM_RGB_SENSOR = _C.SIMULATOR.RGB_SENSOR.clone()
@@ -775,6 +780,11 @@ _C.SIMULATOR.ARM_RGB_SENSOR.UUID = "robot_arm_rgb"
 # -----------------------------------------------------------------------------
 _C.SIMULATOR.ARM_DEPTH_SENSOR = _C.SIMULATOR.DEPTH_SENSOR.clone()
 _C.SIMULATOR.ARM_DEPTH_SENSOR.UUID = "robot_arm_depth"
+# -----------------------------------------------------------------------------
+# ARM SEMANTIC SENSOR
+# -----------------------------------------------------------------------------
+_C.SIMULATOR.ARM_SEMANTIC_SENSOR = _C.SIMULATOR.SEMANTIC_SENSOR.clone()
+_C.SIMULATOR.ARM_SEMANTIC_SENSOR.UUID = "robot_arm_semantic"
 # -----------------------------------------------------------------------------
 # 3rd RGB SENSOR
 # -----------------------------------------------------------------------------

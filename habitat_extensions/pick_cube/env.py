@@ -104,10 +104,14 @@ class PickCubeEnv(gym.Env):
         config.SIMULATOR.HEAD_RGB_SENSOR.HEIGHT = 128
         config.SIMULATOR.HEAD_DEPTH_SENSOR.WIDTH = 128
         config.SIMULATOR.HEAD_DEPTH_SENSOR.HEIGHT = 128
+        config.SIMULATOR.HEAD_SEMANTIC_SENSOR.WIDTH = 128
+        config.SIMULATOR.HEAD_SEMANTIC_SENSOR.HEIGHT = 128
         config.SIMULATOR.ARM_RGB_SENSOR.WIDTH = 128
         config.SIMULATOR.ARM_RGB_SENSOR.HEIGHT = 128
         config.SIMULATOR.ARM_DEPTH_SENSOR.WIDTH = 128
         config.SIMULATOR.ARM_DEPTH_SENSOR.HEIGHT = 128
+        config.SIMULATOR.ARM_SEMANTIC_SENSOR.WIDTH = 128
+        config.SIMULATOR.ARM_SEMANTIC_SENSOR.HEIGHT = 128
         if obs_mode == "state":
             config.SIMULATOR.AGENT_0.SENSORS = []
         else:
@@ -117,6 +121,8 @@ class PickCubeEnv(gym.Env):
                 "ARM_RGB_SENSOR",
                 "ARM_DEPTH_SENSOR",
                 "THIRD_RGB_SENSOR",
+                "HEAD_SEMANTIC_SENSOR",
+                "ARM_SEMANTIC_SENSOR",
             ]
 
         # Simulator custom

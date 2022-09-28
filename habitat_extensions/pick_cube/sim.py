@@ -69,6 +69,7 @@ class PickCubeSim(HabitatSim):
     def _initialize_templates(self):
         obj_attr_mgr = self.get_object_template_manager()
         obj_attr_mgr.load_configs(ASSET_DIR)
+        # obj_attr_mgr.load_configs("/home/jiayuan/projects/github/habitat-lab/data/objects/ycb/configs")
         # print(obj_attr_mgr.get_template_handles())
 
     @property
@@ -104,6 +105,8 @@ class PickCubeSim(HabitatSim):
         # Called before new assets are added
         if not is_same_scene:
             self.robot.reconfigure()
+            for node in self.robot.sim_obj.visual_scene_nodes:
+                node.semantic_id = 200
 
             # from habitat_extensions.utils import art_utils
             # # print(art_utils.get_joint_motors_info(self.robot.sim_obj))
@@ -164,10 +167,15 @@ class PickCubeSim(HabitatSim):
             scale=[10, 0.01, 10],
             static=True,
         )
+        self.ground.semantic_id=0
 
         self.cube = self._add_rigid_object(
             "cube", "transform_box", [0, 0.02, 0], scale=[0.01] * 3
         )
+        self.cube.semantic_id=100
+
+        # self.obj1 = self._add_rigid_object("haha", "002_master_chef_can", [0, 0.5, 0])
+        # self.obj2 = self._add_rigid_object("haha", "072-a_toy_airplane", [0, 0.5, 0])
 
         self.rigid_objs["ground"] = self.ground
         self.rigid_objs["cube"] = self.cube
@@ -264,6 +272,8 @@ class PickCubeSim(HabitatSim):
         if dt is None:
             dt = 1.0 / self.habitat_config.SIM_FREQ
         self.step_world(dt)
+        # self.robot.sim_obj.awake = True
+        # self.robot.arm_motor_forces = np.random.normal(self.robot.arm_motor_forces, 0.001)
 
     def internal_step_by_time(self, seconds):
         steps = int(seconds * self.habitat_config.SIM_FREQ)
