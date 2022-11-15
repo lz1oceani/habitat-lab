@@ -13,7 +13,7 @@ from habitat.config.default import get_config
 from habitat.core.embodied_task import EmbodiedTask, Metrics
 from habitat.core.simulator import Observations, Simulator
 from habitat.sims import make_sim
-from habitat_extensions.pick_cube.sim import PickCubeSim
+from habitat_extensions.pick_clutter.sim import PickClutterSim
 from habitat_extensions.utils.registration import register_gym_env
 
 
@@ -67,9 +67,9 @@ def convert_observation_to_space(observation, prefix=""):
     return space
 
 
-@register_gym_env("HabitatPickCube-v0", 200)
-class PickCubeEnv(gym.Env):
-    _sim: PickCubeSim
+@register_gym_env("HabitatPickClutter-v0", 200)
+class PickClutterEnv(gym.Env):
+    _sim: PickClutterSim
 
     def __init__(self, obs_mode="rgbd"):
         self.obs_mode = obs_mode
@@ -77,8 +77,7 @@ class PickCubeEnv(gym.Env):
         self._viewer = None
 
         self._sim = make_sim(
-            id_sim=self._config.SIMULATOR.TYPE,
-            config=self._config.SIMULATOR,
+            id_sim=self._config.SIMULATOR.TYPE, config=self._config.SIMULATOR
         )
 
         obs = self.reset()
@@ -90,7 +89,7 @@ class PickCubeEnv(gym.Env):
         config = get_config()
         config.defrost()
 
-        config.SIMULATOR.TYPE = "PickCubeSim-v0"
+        config.SIMULATOR.TYPE = "PickClutterSim-v0"
         config.SIMULATOR.HABITAT_SIM_V0.ALLOW_SLIDING = False
         config.SIMULATOR.HABITAT_SIM_V0.ENABLE_PHYSICS = True
 
@@ -100,18 +99,17 @@ class PickCubeEnv(gym.Env):
         # Sensors
         config.SIMULATOR.THIRD_RGB_SENSOR.WIDTH = 128
         config.SIMULATOR.THIRD_RGB_SENSOR.HEIGHT = 128
-
+        
         config.SIMULATOR.THIRD_DEPTH_SENSOR.WIDTH = 128
         config.SIMULATOR.THIRD_DEPTH_SENSOR.HEIGHT = 128
+        
         config.SIMULATOR.THIRD_RGB_SENSOR.HFOV = 60
-
         config.SIMULATOR.HEAD_RGB_SENSOR.WIDTH = 128
         config.SIMULATOR.HEAD_RGB_SENSOR.HEIGHT = 128
         config.SIMULATOR.HEAD_DEPTH_SENSOR.WIDTH = 128
         config.SIMULATOR.HEAD_DEPTH_SENSOR.HEIGHT = 128
         config.SIMULATOR.HEAD_SEMANTIC_SENSOR.WIDTH = 128
         config.SIMULATOR.HEAD_SEMANTIC_SENSOR.HEIGHT = 128
-
         config.SIMULATOR.ARM_RGB_SENSOR.WIDTH = 128
         config.SIMULATOR.ARM_RGB_SENSOR.HEIGHT = 128
         config.SIMULATOR.ARM_DEPTH_SENSOR.WIDTH = 128
@@ -125,6 +123,7 @@ class PickCubeEnv(gym.Env):
                 "HEAD_RGB_SENSOR",
                 "HEAD_DEPTH_SENSOR",
                 "HEAD_SEMANTIC_SENSOR",
+                
                 "ARM_RGB_SENSOR",
                 "ARM_DEPTH_SENSOR",
                 "ARM_SEMANTIC_SENSOR",
@@ -182,7 +181,7 @@ class PickCubeEnv(gym.Env):
 
         observations = self._sim.step()
         observations.update(self.get_obs_state())
-        return observations["agent"]
+        return observations["robot_arm_rgb"]
 
     def get_reward(self, info, **kwargs):
         reward = 0.0
@@ -193,10 +192,10 @@ class PickCubeEnv(gym.Env):
 
         tcp_pose = self._sim.robot.ee_transform
         tcp_pos = np.float32(tcp_pose.translation)
-        obj_pos = np.float32(self._sim.cube.translation)
+        # obj_pos = np.float32(self._sim.cube.translation)
         goal_pos = self._sim.goal_pos
 
-        tcp_to_obj_pos = obj_pos - tcp_pos
+        tcp_to_obj_pos = - tcp_pos
         tcp_to_obj_dist = np.linalg.norm(tcp_to_obj_pos)
         reaching_reward = 1 - np.tanh(5 * tcp_to_obj_dist)
         reward += reaching_reward
@@ -215,9 +214,10 @@ class PickCubeEnv(gym.Env):
         return info["success"]
 
     def check_obj_placed(self):
-        obj_pos = np.float32(self._sim.cube.translation)
-        goal_pos = self._sim.goal_pos
-        return np.linalg.norm(goal_pos - obj_pos) <= 0.025
+        return False
+        # obj_pos = np.float32(self._sim.cube.translation)
+        # goal_pos = self._sim.goal_pos
+        # return np.linalg.norm(goal_pos - obj_pos) <= 0.025
 
     def check_robot_static(self, thresh=0.2):
         # Assume that the last two DoF is gripper

@@ -36,8 +36,12 @@ def make_render_only(obj):
     obj.collidable = False
 
 
-@registry.register_simulator(name="PickCubeSim-v0")
-class PickCubeSim(HabitatSim):
+model_list = ['002_master_chef_can', '003_cracker_box', '004_sugar_box', '005_tomato_soup_can', '006_mustard_bottle', '007_tuna_fish_can', '008_pudding_box', '009_gelatin_box', '010_potted_meat_can', '011_banana', '012_strawberry', '013_apple', '014_lemon', '015_peach', '016_pear', '017_orange', '018_plum', '019_pitcher_base', '021_bleach_cleanser', '024_bowl', '025_mug', '026_sponge', '030_fork', '031_spoon', '032_knife', '033_spatula', '035_power_drill', '036_wood_block', '037_scissors', '038_padlock', '040_large_marker', '042_adjustable_wrench', '043_phillips_screwdriver', '044_flat_screwdriver', '048_hammer', '050_medium_clamp', '051_large_clamp', '052_extra_large_clamp', '053_mini_soccer_ball', '054_softball', '055_baseball', '056_tennis_ball', '057_racquetball', '058_golf_ball', '061_foam_brick', '062_dice', '063-a_marbles', '063-b_marbles', '065-a_cups', '065-b_cups', '065-c_cups', '065-d_cups', '065-e_cups', '065-f_cups', '065-g_cups', '065-h_cups', '065-i_cups', '065-j_cups', '070-a_colored_wood_blocks', '070-b_colored_wood_blocks', '071_nine_hole_peg_test', '072-a_toy_airplane', '072-b_toy_airplane', '072-c_toy_airplane', '072-d_toy_airplane', '072-e_toy_airplane', '073-a_lego_duplo', '073-b_lego_duplo', '073-c_lego_duplo', '073-d_lego_duplo', '073-e_lego_duplo', '073-f_lego_duplo', '073-g_lego_duplo', '077_rubiks_cube']
+
+
+
+@registry.register_simulator(name="PickClutterSim-v0")
+class PickClutterSim(HabitatSim):
     # ROBOT_URDF_PATH = "data/robots/franka_panda/panda_arm_hand.urdf"
 
     def __init__(self, config: Config):
@@ -69,8 +73,7 @@ class PickCubeSim(HabitatSim):
     def _initialize_templates(self):
         obj_attr_mgr = self.get_object_template_manager()
         obj_attr_mgr.load_configs(ASSET_DIR)
-        # obj_attr_mgr.load_configs("/home/jiayuan/projects/github/habitat-lab/data/objects/ycb/configs")
-        # print(obj_attr_mgr.get_template_handles())
+        obj_attr_mgr.load_configs("/home/lz/data/github_code/habitat-lab/data/objects/ycb/configs")
 
     @property
     def timestep(self):
@@ -169,16 +172,19 @@ class PickCubeSim(HabitatSim):
         )
         self.ground.semantic_id=0
 
-        self.cube = self._add_rigid_object(
-            "cube", "transform_box", [0, 0.02, 0], scale=[0.01] * 3
-        )
-        self.cube.semantic_id=100
-
+        # self.cube = self._add_rigid_object(
+        #     "cube", "transform_box", [0, 0.02, 0], scale=[0.01] * 3
+        # )
+        # self.cube.semantic_id=100
+        self.objs = []
+        for i, model in enumerate(model_list):
+            self.objs.append(self._add_rigid_object(f"ycb-{i}", model, [0, 0, 0], static=True))
+        
         # self.obj1 = self._add_rigid_object("haha", "002_master_chef_can", [0, 0.5, 0])
         # self.obj2 = self._add_rigid_object("haha", "072-a_toy_airplane", [0, 0.5, 0])
 
         self.rigid_objs["ground"] = self.ground
-        self.rigid_objs["cube"] = self.cube
+        # self.rigid_objs["cube"] = self.cube
 
     def _remove_rigid_objects(self):
         rigid_obj_mgr = self.get_rigid_object_manager()
@@ -244,20 +250,20 @@ class PickCubeSim(HabitatSim):
         self.robot.sim_obj.rotation = mn.Quaternion.identity_init()
 
         # Place the cube
-        x, z = np.random.uniform(-0.1, 0.1, [2])
-        ori = np.random.uniform(0, 2 * np.pi)
-        self.cube.translation = mn.Vector3(x, 0.02, z)
-        self.cube.rotation = mn.Quaternion(mn.Vector3(0, 1, 0), mn.Rad(ori))
+        # x, z = np.random.uniform(-0.1, 0.1, [2])
+        # ori = np.random.uniform(0, 2 * np.pi)
+        # self.cube.translation = mn.Vector3(x, 0.02, z)
+        # self.cube.rotation = mn.Quaternion(mn.Vector3(0, 1, 0), mn.Rad(ori))
 
         # Sample a goal position far enough from the object
-        obj_pos = np.float32(self.cube.translation)
-        for i in range(100):
-            x, z = np.random.uniform(-0.1, 0.1, [2])
-            y = np.random.uniform(0, 0.5) + obj_pos[1]
-            goal_pos = np.hstack([x, y, z])
-            if np.linalg.norm(goal_pos - obj_pos) > 0.05:
-                break
-        self.goal_pos = np.float32(goal_pos)
+        # obj_pos = np.float32(self.cube.translation)
+        # for i in range(100):
+        #     x, z = np.random.uniform(-0.1, 0.1, [2])
+        #     y = np.random.uniform(0, 0.5) + obj_pos[1]
+        #     goal_pos = np.hstack([x, y, z])
+        #     if np.linalg.norm(goal_pos - obj_pos) > 0.05:
+        #         break
+        self.goal_pos = np.float32(np.zeros(3))
 
         return self.get_observations()
 
